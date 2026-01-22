@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>3D Prayer Card Carousel</title>
+<style>
+
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: url('bg.jpg') no-repeat center/cover;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+  position: relative;
+}
+
+
+.blur-overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  backdrop-filter: blur(5px);
+  z-index: -1;
+}
+
+
+.carousel-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  z-index: 1;
+}
+
+
+.book {
+  width: 600px;
+  height: 400px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease;
+}
+
+
+.page {
+  width: 300px;
+  height: 100%;
+  position: absolute;
+  border: 2px solid black;
+  border-radius: 5px;
+  transform-style: preserve-3d;
+}
+
+
+.left {
+  transform-origin: right center;
+  transition: transform 1.0s;
+  box-shadow: -5px 0 20px rgba(0,0,0,0.3);
+  background: linear-gradient(to right, white 95%, rgba(200,200,200,0.2) 100%);
+}
+
+.right {
+  right: 0;
+  z-index: 1;
+  background: white;
+  box-shadow: inset 10px 0 30px rgba(0,0,0,0.2);
+}
+
+
+.left .front {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: white;
+  backface-visibility: hidden;
+  border-radius: 15px;
+}
+
+
+.left .back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  transform: rotateY(180deg);
+  backface-visibility: hidden;
+  border-radius: 5px;
+  box-shadow: inset -10px 0 30px rgba(0,0,0,0.1);
+}
+
+
+.book.open .left {
+  transform: rotateY(165deg);
+}
+
+.thickness {
+  position: absolute;
+  top: 0;
+  right: -6px;
+  width: 6px;
+  height: 100%;
+  background: linear-gradient(to right, #555, #222, #555);
+  border-radius: 0 5px 5px 0;
+}
+
+
+button {
+  background: linear-gradient(to bottom, #fff, #ddd);
+  border: 2px solid #ccc;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 15px;
+  color: #444;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.4), inset 0 -3px 3px rgba(255,255,255,0.6);
+  transition: all 0.3s;
+  position: relative;
+}
+button:hover {
+  background: linear-gradient(to bottom, #fff, #eee);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.5), inset 0 -3px 3px rgba(255,255,255,0.6);
+}
+
+button::before {
+  content: '';
+  position: absolute;
+  width: 120%;
+  height: 120%;
+  top: -10%;
+  left: -10%;
+  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: -1;
+}
+
+
+.instruction-text {
+  position: absolute;
+  top: -50px;
+  width: 100%;
+  text-align: center;
+  font-size: 16px;
+  letter-spacing: 1px;
+  color: rgba(2, 2, 2, 0.9);
+  text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+  animation: pulse 2s infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+
+#prev {
+  margin-right: 40px;
+}
+#next {
+  margin-left: 40px;
+}
+</style>
+</head>
+<body>
+
+  
+
+<div class="blur-overlay"></div>
+
+<div class="carousel-container">
+  <button id="prev">&#10094;</button>
+  
+  <div class="instruction-text">
+  Click the card to close 🙏
+</div>
+
+  <div class="book" id="book">
+    <div class="page left">
+      <div class="front"></div>
+      <div class="back"></div>
+      <div class="thickness"></div>
+    </div>
+    <div class="page right">
+      <img src="" alt="Inside Page" style="width:100%;height:100%;object-fit:cover;">
+    </div>
+  </div>
+  
+  <button id="next">&#10095;</button>
+</div>
+
+<script>
+
+
+const prayerCards = [
+  { back: '1.png', inside: '2.png' },
+  { back: '3.png', inside: '4.png' },
+  { back: '5.png', inside: '6.png' },
+  { back: '7.png', inside: '8.png' },
+  { back: '9.png', inside: '10.png' },
+  { back: '11.png', inside: '12.png' },
+  { back: '13.png', inside: '14.png' },
+  { back: '15.png', inside: '16.png' },
+  { back: '17.png', inside: '18.png' },
+  { back: '19.png', inside: '20.png' }
+ 
+];
+
+let currentIndex = 0;
+const book = document.getElementById('book');
+const leftBack = book.querySelector('.left .back');
+const rightImg = book.querySelector('.right img');
+
+
+function updateCard(index) {
+  leftBack.style.backgroundImage = `url('${prayerCards[index].back}')`;
+  rightImg.src = prayerCards[index].inside;
+  book.classList.remove('open'); 
+}
+
+
+updateCard(currentIndex);
+
+
+
+document.getElementById('prev').addEventListener('click', () => {
+  currentIndex = (currentIndex - 1 + prayerCards.length) % prayerCards.length;
+  updateCard(currentIndex);
+});
+
+document.getElementById('next').addEventListener('click', () => {
+  currentIndex = (currentIndex + 1) % prayerCards.length;
+  updateCard(currentIndex);
+});
+
+book.addEventListener('click', () => {
+  book.classList.toggle('open');
+});
+</script>
+
+</body>
+</html>
